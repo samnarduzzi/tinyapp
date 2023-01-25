@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const bodyParser = require('body-parser')
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -10,6 +11,16 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+ const generateRandomString = function() {
+  let result = '';
+  let char = '1234567890abcdefghijklmnopqrstuvwxyz';
+  let charLength = char.length;
+  for (let i = 0; i < 6; i++) {
+    result += char[Math.floor(Math.random() * charLength)];
+  }
+  return result;
+}
 
 app.get("/", (req, res) => {
   res.send("Hello!");
