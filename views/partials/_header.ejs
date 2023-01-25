@@ -21,6 +21,10 @@
         <input type="text" name="username" placeholder="Username">
         <button type="submit" class="btn btn-primary"> Login</button>
       </form>
+      <h6 class="nav-item nav-link" style="margin-top: 0.5rem">Logged in as: <%= username %></h6>
+      <form class="form-inline" method="POST" action="/logout" style="margin-left: 35rem">
+        <button type="submit" class="btn btn-outline-primary">Logout</button>
+      </form>
     </div>
   </nav>
 </header>
