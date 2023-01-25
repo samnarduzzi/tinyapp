@@ -12,19 +12,32 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
+
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
+
       <form method="POST" action="/login">
         <input type="text" name="username" placeholder="Username">
         <button type="submit" class="btn btn-primary"> Login</button>
       </form>
-      <h6 class="nav-item nav-link" style="margin-top: 0.5rem">Logged in as: <%= username %></h6>
-      <form class="form-inline" method="POST" action="/logout" style="margin-left: 35rem">
-        <button type="submit" class="btn btn-outline-primary">Logout</button>
+
+      <h6 class="nav-item nav-link">Logged in as: <%= username %></h6>
+
+      <div>
+        <form method="POST" action="/register">
+          <button type="submit" class="btn btn-outline-dark">
+            Register
+          </button>
+        </form>
+      </div>
+      
+      <form class="form-inline" method="POST" action="/logout">
+        <button type="submit" class="btn btn-outline-dark">Logout</button>
       </form>
+      
     </div>
   </nav>
 </header>

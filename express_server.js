@@ -74,6 +74,13 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.get('/register', (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"]
+  }
+  res.render('urls_registration', templateVars)
+})
+
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
@@ -87,6 +94,7 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+  const user = findID(users, req.body.email);
   res.cookie('username', req.body.username);
   res.redirect('/urls');
 });
@@ -99,10 +107,3 @@ app.post('/logout', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
-// app.post("/urls", (req, res) => {
-//   console.log(req.body); // Log the POST request body to the console
-//   res.send("Ok"); // Respond with 'Ok' (we will replace this)
-// });
