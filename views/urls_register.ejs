@@ -14,20 +14,30 @@
 </head>
 
 <body>
-  <% include partial/_header.ejs %>
+  <%- include('partials/_header') %>
 
     <main>
       <h4>Register</h4>
-      <form action="/register" method="POST"></form>
+      <form action="/register" method="POST">
       <tr>
         <div>
-          <label for="longURL">Email Address</label>
-          <input type="email" name="email" placeholder="Enter Email">
-          <label for="longURL">Password</label>
-          <input type="password" name="password" placeholder="Enter Password">
+          <label for="email">Email Address</label>
+          <input 
+          type="email" 
+          name="email" 
+          placeholder="Enter Email">
+          </div>
+
+          <div>
+          <label for="password">Password</label>
+          <input 
+          type="password" 
+          name="password" 
+          placeholder="Enter Password">
         </div>
       </tr>
       <button type="submit" class="btn btn outline-sucess">Submit</button>
+    </form>
     </main>
 
     <!-- Bootstrap JS -->
