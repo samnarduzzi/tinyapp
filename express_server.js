@@ -3,8 +3,13 @@ const PORT = 8080; // default port 8080
 //_________________________________________________________________________
 
 
+// -----* HELPER FUNCTIONS *----- //
+const { generateRandomString, userFound, urlsForUser } = require('./helper_functions');
+//_________________________________________________________________________
+
+
 // -----* DEPENDENCIES *----- //
-const express = require("express");
+const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -17,8 +22,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("view engine", "ejs")
-//_________________________________________________________________________
 
+
+keys: "random"
+//_________________________________________________________________________
 
 
 // -----* URL / USER DATA *----- //
@@ -55,15 +62,12 @@ app.get("/urls.json", (req, res) => {
 
 // -----* REGISTRATION GET *----- //
 app.get('/register', (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const userID = req.cookies.user_id;
+
   const templateVars = {
-    user
+    user: users[userID]
   };
-<<<<<<< HEAD
   if (!userID) {
-=======
-  if (!user) {
->>>>>>> parent of c087313 (helper function added)
     res.render('register', templateVars);
   } else {
     res.redirect('/urls');
@@ -83,9 +87,9 @@ app.post('/register', (req, res) => {
     res.status(400).send("Error, please fill in all areas");
   }
 
-  if (userFound) {
-      return res.status(400).send("This email is already in use ");
-    }
+  if (userFound(users, email)) {
+    return res.status(400).send("This email is already in use ");
+  }
 
   users[newUser] = {
     email: email,
@@ -93,7 +97,7 @@ app.post('/register', (req, res) => {
     id: newUser,
   };
 
-  res.cookie('user_id', userId);
+  res.cookie('user_id', newUser);
   res.redirect('/urls');
 });
 //_________________________________________________________________________
@@ -101,11 +105,12 @@ app.post('/register', (req, res) => {
 
 // -----* LOGIN GET *----- //
 app.get('/login', (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const userID = req.cookies.user_id;
+
   const templateVars = {
-    user
+    user: users[userID]
   };
-  if (!user) {
+  if (!userID) {
     res.render('login', templateVars);
   } else {
     res.redirect('/urls');
@@ -119,21 +124,21 @@ app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-if (!userFound) {
-  return res.status(403).send("Email has not yet been registered")
-}
+  if (!userFound(users, email)) {
+    return res.status(403).send("Email has not yet been registered");
+  }
 
-if (userFound.password !== password) {
-  return res.status(403).send("Invalid password. Please try again")
-}
+  if ((userFound(users, email)).password !== password) {
+    return res.status(403).send("Invalid password. Please try again");
+  }
 
-if (!email || !password) {
-  return res.status(403).send("Please provide an email and password")
-}
+  if (!email || !password) {
+    return res.status(403).send("Please provide an email and password");
+  }
 
-res.cookie('user_id', userFound.id)
-res.redirect('/urls')
-})
+  res.cookie('user_id', userFound.id);
+  res.redirect('/urls');
+});
 //_________________________________________________________________________
 
 
@@ -164,7 +169,7 @@ app.get("/urls/new", (req, res) => {
 
   if (!templateVars.user) {
     res.redirect('/login');
-    return;
+    // return;
   }
   res.render('urls_new', templateVars);
 });
@@ -202,37 +207,17 @@ app.post('/urls', (req, res) => {
 
 // -----* DELETE A URL *----- //
 app.post('/urls/:id/delete', (req, res) => {
-  const id = req.params.id
-  delete urlDatabase[id]
+  const id = req.params.id;
+  delete urlDatabase[id];
 
   res.redirect('/urls');
 });
 //_________________________________________________________________________
 
 
-// -----* HELPER FUNCTIONS *----- //
-const generateRandomString = function() {
-  let result = '';
-  let char = '1234567890abcdefghijklmnopqrstuvwxyz';
-  let charLength = char.length;
-  for (let i = 0; i < 6; i++) {
-    result += char[Math.floor(Math.random() * charLength)];
-  }
-  return result;
-};
-
-const userFound = function(users, email) {
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      return users[userId];
-    }
-  }
-  return false;
-};
-//_________________________________________________________________________
-
 // -----* LISTENING PORT *----- //
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 //_________________________________________________________________________
+
