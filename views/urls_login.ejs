@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
+
+  <title>TinyApp - Login Page</title>
+  <title>Document</title>
+</head>
+
+<body>
+
+  <%- include('partials/_header') %>
+
+    <h3> Login Here </h3>
+    <form action="/Login" method="POST">
+      <label for="email"> Email: </label>
+      <input type="email" name="email" placeholder="Email Address Here" />
+      <br>
+      <label for="password"> Password: </label>
+      <input type="password" name="password" placeholder="Password Here" />
+      <br>
+      <button type="sumbit" class="btn btn-primary"> Click to Login!</button>
+    </form>
+</body>
+
+</html>
