@@ -20,13 +20,14 @@
 
     <h3> Login Here </h3>
     <form action="/Login" method="POST">
-      <label for="email"> Email: </label>
-      <input type="email" name="email" placeholder="Email Address Here" />
-      <br>
-      <label for="password"> Password: </label>
-      <input type="password" name="password" placeholder="Password Here" />
-      <br>
-      <button type="sumbit" class="btn btn-primary"> Click to Login!</button>
+      <div class="form-group mb-2">
+        <label for="email"> Email: </label>
+        <input class="form-control mb-3" type="email" name="email" placeholder="Email Address Here" />
+        <br>
+        <label for="password"> Password: </label>
+        <input class="form-control mb-3" type="password" name="password" placeholder="Password Here" />
+        <br>
+        <button type="sumbit" class="btn btn-primary"> Click to Login!</button>
     </form>
 </body>
 

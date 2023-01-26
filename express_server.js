@@ -4,7 +4,7 @@ const PORT = 8080; // default port 8080
 
 
 // -----* HELPER FUNCTIONS *----- //
-const { generateRandomString, userFound, urlsForUser } = require('./helper_functions');
+const { generateRandomString, userFound, urlsForUser } = require('./helper');
 //_________________________________________________________________________
 
 
@@ -23,8 +23,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("view engine", "ejs")
 
-
-keys: "random"
 //_________________________________________________________________________
 
 
