@@ -18,6 +18,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.set("view engine", "ejs")
 //_________________________________________________________________________
 
 
@@ -61,8 +62,7 @@ app.get('/register', (req, res) => {
     user: users[userID]
   };
   if (!userID) {
-    res.render("urls_register");
-    // res.render('register', templateVars);
+    res.render('register', templateVars);
   } else {
     res.redirect('/urls');
   }
