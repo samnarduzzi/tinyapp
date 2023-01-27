@@ -82,6 +82,7 @@ app.post('/register', (req, res) => {
 
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(newPassword, salt);
   const newUser = generateRandomString();
 
   if (!email || !password) {
@@ -136,6 +137,10 @@ app.post('/login', (req, res) => {
 
   if (!email || !password) {
     return res.status(403).send("Please provide an email and password");
+  }
+
+  if (!bcrypt.compareSync(loginPassword, foundUser.password)) {
+    return res.status(403).send(`Password is incorrect!`);
   }
 
   req.session.user_id = userFound.id;
