@@ -4,7 +4,7 @@ const PORT = 8080; // default port 8080
 
 
 // -----* HELPER FUNCTIONS *----- //
-const { generateRandomString, userFound, urlsForUser } = require('./helper');
+const { generateRandomString, getUserByEmail, urlsForUser } = require('./helper');
 //_________________________________________________________________________
 
 
@@ -89,7 +89,7 @@ app.post('/register', (req, res) => {
     res.status(400).send("Error, please fill in email and password areas");
   }
 
-  if (userFound(users, email)) {
+  if (getUserByEmail(users, email)) {
     return res.status(400).send("This email is already in use ");
   }
 
@@ -126,13 +126,13 @@ const userID = req.session.user_id;
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const foundUser = userFound(users, email)
+  const foundUser = getUserByEmail(users, email)
 
-  if (!userFound(users, email)) {
+  if (!getUserByEmail(users, email)) {
     return res.status(403).send("Email has not yet been registered");
   }
 
-  // if ((userFound(users, email)).password !== password) {
+  // if ((getUserByEmail(users, email)).password !== password) {
   //   return res.status(403).send("Invalid password. Please try again");
   // }
 
