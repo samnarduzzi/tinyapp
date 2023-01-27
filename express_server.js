@@ -12,7 +12,7 @@ const { generateRandomString, userFound, urlsForUser } = require('./helper');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 //_________________________________________________________________________
 
 
@@ -20,9 +20,11 @@ const cookieParser = require('cookie-parser');
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.set("view engine", "ejs")
-
+app.use(morgan('dev'))
+app.use(cookieSession({ 
+  name: 'session', 
+  keys: ['slipperySalmon2999']
+}));
 //_________________________________________________________________________
 
 
@@ -60,7 +62,7 @@ app.get("/urls.json", (req, res) => {
 
 // -----* REGISTRATION GET *----- //
 app.get('/register', (req, res) => {
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
 
   const templateVars = {
     user: users[userID]
@@ -103,11 +105,12 @@ app.post('/register', (req, res) => {
 
 // -----* LOGIN GET *----- //
 app.get('/login', (req, res) => {
-  const userID = req.cookies.user_id;
+const userID = req.session.user_id;
 
   const templateVars = {
     user: users[userID]
   };
+
   if (!userID) {
     res.render('login', templateVars);
   } else {
@@ -134,7 +137,7 @@ app.post('/login', (req, res) => {
     return res.status(403).send("Please provide an email and password");
   }
 
-  res.cookie('user_id', userFound.id);
+  res.session('user_id', userFound.id);
   res.redirect('/urls');
 });
 //_________________________________________________________________________
@@ -142,7 +145,8 @@ app.post('/login', (req, res) => {
 
 // -----* LOGOUT POST *----- //
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');  //username
+  res.clearCookie('session.sig'); 
+  res.clearCookie('session')
   res.redirect('/login');
 });
 //_________________________________________________________________________
@@ -150,10 +154,16 @@ app.post('/logout', (req, res) => {
 
 // -----* MAIN URL *----- //
 app.get("/urls", (req, res) => {
+  const userID = req.session.user_id;
+  const urls = urlsForUser(users, database)
+  
   const templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]]
+    urls: urls,
+    user: users[userID]
   };
+  if (!userID) {
+    return res.status(403).send(`Please sign in to see this page.`);
+  }
   res.render("urls_index", templateVars);
 });
 //_________________________________________________________________________
@@ -162,26 +172,26 @@ app.get("/urls", (req, res) => {
 // -----* NEW URL *----- //
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session["user_id"]]
   };
 
   if (!templateVars.user) {
-    res.redirect('/login');
-    // return;
+    return res.redirect('/login');
   }
-  res.render('urls_new', templateVars);
+  return res.render('urls_new', templateVars);
 });
 //_________________________________________________________________________
 
 
 // -----* SHORT URL *----- //
 app.get("/urls/:id", (req, res) => {
+  const userID = req.session.user_id;
+
   const templateVars = {
     longURL: urlDatabase[req.params.id],
     id: req.params.id,
-    user: users[req.cookies["user_id"]]
+    user: users[userID]
   };
-
   res.render("urls_show", templateVars);
 });
 //_________________________________________________________________________
@@ -197,7 +207,10 @@ app.get("/u/:id", (req, res) => {
 // -----* POST FOR URL *----- //
 app.post('/urls', (req, res) => {
   const newShortURL = generateRandomString();
-  urlDatabase[newShortURL] = req.body.longURL;
+  urlDatabase[newShortURL] = {
+    longURL: req.body.longURL,
+    userID: req.session.user_id
+  };
 
   res.redirect(`/urls/${newShortURL}`);
 });
@@ -206,7 +219,13 @@ app.post('/urls', (req, res) => {
 // -----* DELETE A URL *----- //
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
-  delete urlDatabase[id];
+  const userID = req.session.user_id;
+  
+  if (req.session.user_id === urlDatabase[id].userID) {
+    
+    delete urlDatabase[id];
+  }
+
 
   res.redirect('/urls');
 });
