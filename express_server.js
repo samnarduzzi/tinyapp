@@ -4,7 +4,7 @@ const PORT = 8080; // default port 8080
 
 
 // -----* HELPER FUNCTIONS *----- //
-const { generateRandomString, getUserByEmail, urlsForUser } = require('./helper');
+const { generateRandomString, getUserByEmail } = require('./helper');
 //_________________________________________________________________________
 
 
@@ -13,8 +13,8 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
-const bcrypt = require('bcryptjs')
-const salt = bcrypt.genSaltSync(10)
+const bcrypt = require('bcryptjs');
+const salt = bcrypt.genSaltSync(10);
 //_________________________________________________________________________
 
 
@@ -22,8 +22,8 @@ const salt = bcrypt.genSaltSync(10)
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieSession({ 
-  name: 'session', 
+app.use(cookieSession({
+  name: 'session',
   keys: ['slipperySalmon2999']
 }));
 //_________________________________________________________________________
@@ -107,7 +107,7 @@ app.post('/register', (req, res) => {
 
 // -----* LOGIN GET *----- //
 app.get('/login', (req, res) => {
-const userID = req.session.user_id;
+  const userID = req.session.user_id;
 
   const templateVars = {
     user: users[userID]
@@ -126,15 +126,11 @@ const userID = req.session.user_id;
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const foundUser = getUserByEmail(users, email)
+  const foundUser = getUserByEmail(users, email);
 
   if (!getUserByEmail(users, email)) {
     return res.status(403).send("Email has not yet been registered");
   }
-
-  // if ((getUserByEmail(users, email)).password !== password) {
-  //   return res.status(403).send("Invalid password. Please try again");
-  // }
 
   if (!email || !password) {
     return res.status(403).send("Please provide an email and password");
@@ -152,8 +148,7 @@ app.post('/login', (req, res) => {
 
 // -----* LOGOUT POST *----- //
 app.post('/logout', (req, res) => {
-  // res.clearCookie('session.sig'); 
-  res.clearCookie('session')
+  res.clearCookie('session');
   res.redirect('/login');
 });
 //_________________________________________________________________________
@@ -162,8 +157,7 @@ app.post('/logout', (req, res) => {
 // -----* MAIN URL *----- //
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
-  // const urls = urlsForUser(users, urlDatabase)
-  
+
   const templateVars = {
     urls: urlDatabase,
     user: users[userID]
@@ -223,7 +217,7 @@ app.post('/urls', (req, res) => {
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
   const userID = req.session.user_id;
-  
+
   if (req.session.user_id === urlDatabase[id].userID) {
 
     delete urlDatabase[id];

@@ -24,16 +24,4 @@ const getUserByEmail = function(users, email) {
 
 
 
-const urlsForUser = function (user, database) {
-  const userURL = {};
-  for (const urlId in database) {
-    if (database[urlId].userID === user) {
-      userURL[urlId] = database[urlId].longURL;
-    }
-  }
-  return userURL;
-};
-
-
-
-module.exports = { generateRandomString, getUserByEmail, urlsForUser };
+module.exports = { generateRandomString, getUserByEmail };
