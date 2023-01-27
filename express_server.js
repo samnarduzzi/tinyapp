@@ -13,6 +13,8 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
+const bcrypt = require('bcryptjs')
+const salt = bcrypt.genSaltSync(10)
 //_________________________________________________________________________
 
 
@@ -173,7 +175,6 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     user: users[req.session["user_id"]]
   };
-
   if (!req.session.user_id) {
     return res.redirect('/login');
   }
