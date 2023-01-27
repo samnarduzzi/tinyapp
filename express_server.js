@@ -77,16 +77,16 @@ app.get('/register', (req, res) => {
 //_________________________________________________________________________
 
 
-// -----* REGISTRATION post *----- //
+// -----* REGISTRATION POST *----- //
 app.post('/register', (req, res) => {
 
   const email = req.body.email;
   const password = req.body.password;
-  const hashedPassword = bcrypt.hashSync(newPassword, salt);
+  const hashedPassword = bcrypt.hashSync(password, salt);
   const newUser = generateRandomString();
 
   if (!email || !password) {
-    res.status(400).send("Error, please fill in all areas");
+    res.status(400).send("Error, please fill in email and password areas");
   }
 
   if (userFound(users, email)) {
@@ -95,11 +95,11 @@ app.post('/register', (req, res) => {
 
   users[newUser] = {
     email: email,
-    password: password,
+    password: hashedPassword,
     id: newUser,
   };
 
-  res.cookie('user_id', newUser);
+  req.session.user_id = newUser;
   res.redirect('/urls');
 });
 //_________________________________________________________________________
@@ -126,24 +126,25 @@ const userID = req.session.user_id;
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const foundUser = userFound(users, email)
 
   if (!userFound(users, email)) {
     return res.status(403).send("Email has not yet been registered");
   }
 
-  if ((userFound(users, email)).password !== password) {
-    return res.status(403).send("Invalid password. Please try again");
-  }
+  // if ((userFound(users, email)).password !== password) {
+  //   return res.status(403).send("Invalid password. Please try again");
+  // }
 
   if (!email || !password) {
     return res.status(403).send("Please provide an email and password");
   }
 
-  if (!bcrypt.compareSync(loginPassword, foundUser.password)) {
+  if (!bcrypt.compareSync(password, foundUser.password)) {
     return res.status(403).send(`Password is incorrect!`);
   }
 
-  req.session.user_id = userFound.id;
+  req.session.user_id = foundUser.id;
   res.redirect('/urls');
 });
 //_________________________________________________________________________
@@ -151,7 +152,7 @@ app.post('/login', (req, res) => {
 
 // -----* LOGOUT POST *----- //
 app.post('/logout', (req, res) => {
-  res.clearCookie('session.sig'); 
+  // res.clearCookie('session.sig'); 
   res.clearCookie('session')
   res.redirect('/login');
 });
@@ -167,9 +168,6 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     user: users[userID]
   };
-  // if (!userID) {
-  //   return res.status(403).send(`Please sign in to see this page.`);
-  // }
   res.render("urls_index", templateVars);
 });
 //_________________________________________________________________________
