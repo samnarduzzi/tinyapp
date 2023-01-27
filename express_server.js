@@ -20,7 +20,6 @@ const cookieSession = require('cookie-session');
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'))
 app.use(cookieSession({ 
   name: 'session', 
   keys: ['slipperySalmon2999']
@@ -137,7 +136,7 @@ app.post('/login', (req, res) => {
     return res.status(403).send("Please provide an email and password");
   }
 
-  res.session('user_id', userFound.id);
+  req.session.user_id = userFound.id;
   res.redirect('/urls');
 });
 //_________________________________________________________________________
@@ -155,15 +154,15 @@ app.post('/logout', (req, res) => {
 // -----* MAIN URL *----- //
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
-  const urls = urlsForUser(users, database)
+  // const urls = urlsForUser(users, urlDatabase)
   
   const templateVars = {
-    urls: urls,
+    urls: urlDatabase,
     user: users[userID]
   };
-  if (!userID) {
-    return res.status(403).send(`Please sign in to see this page.`);
-  }
+  // if (!userID) {
+  //   return res.status(403).send(`Please sign in to see this page.`);
+  // }
   res.render("urls_index", templateVars);
 });
 //_________________________________________________________________________
@@ -175,7 +174,7 @@ app.get("/urls/new", (req, res) => {
     user: users[req.session["user_id"]]
   };
 
-  if (!templateVars.user) {
+  if (!req.session.user_id) {
     return res.redirect('/login');
   }
   return res.render('urls_new', templateVars);
@@ -222,7 +221,7 @@ app.post('/urls/:id/delete', (req, res) => {
   const userID = req.session.user_id;
   
   if (req.session.user_id === urlDatabase[id].userID) {
-    
+
     delete urlDatabase[id];
   }
 

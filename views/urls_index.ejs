@@ -31,18 +31,16 @@
                 <%= id %>
               </td>
               <td>
-                <%= urls[id] %>
+                <%= urls[id]%>
               </td>
               <td>
-                <form mehtod="GET" action="/urls/<%= id %>">
-                  <button type="sumbit" class="btn btn-outline-primary"> Edit
-                  </button>
+                <form method="GET" action="/urls/<%= id %>">
+                  <button type="submit" class="btn btn-primary">Edit</button>
                 </form>
               </td>
               <td>
                 <form method="POST" action="/urls/<%= id %>/delete">
-                  <button type="sumbit" class="btn btn-outline-danger"> Delete
-                  </button>
+                  <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
               </td>
             </tr>
