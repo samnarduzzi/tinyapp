@@ -175,6 +175,7 @@ app.get("/urls", (req, res) => {
     urls: userUrls,
     user: users[userID]
   };
+  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -232,7 +233,7 @@ app.get("/u/:id", (req, res) => {
 });
 //_________________________________________________________________________
 
-//-----* EDIT URL ID *-----// NEW!!
+//-----* EDIT URL ID *-----// 
 
 app.post("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
@@ -265,13 +266,13 @@ app.post('/urls', (req, res) => {
   if (!req.session.user_id) {
     return res.status(401).send('Error: You need to be logged in to create a new URL.');
   }
-
+console.log(req.body);
   const newShortURL = generateRandomString();
   urlDatabase[newShortURL] = {
     longURL: req.body.longURL,
     userID: req.session.user_id
   };
-
+console.log(urlDatabase);
   res.redirect(`/urls/${newShortURL}`);
 });
 //_________________________________________________________________________
