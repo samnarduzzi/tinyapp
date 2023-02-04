@@ -132,6 +132,7 @@ app.post('/login', (req, res) => {
     return res.status(403).send("Email has not yet been registered");
   }
 
+
   if (!email || !password) {
     return res.status(403).send("Please provide an email and password");
   }
@@ -148,22 +149,36 @@ app.post('/login', (req, res) => {
 
 // -----* LOGOUT POST *----- //
 app.post('/logout', (req, res) => {
-  res.clearCookie('session');
+  req.session = null;
   res.redirect('/login');
 });
 //_________________________________________________________________________
 
 
 // -----* MAIN URL *----- //
+
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
 
+  if (!userID) {
+    return res.status(401).send("You must be logged in to view the URLs.");
+  }
+
+  const userUrls = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === userID) {
+      userUrls[shortURL] = urlDatabase[shortURL];
+    }
+  }
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: userUrls,
     user: users[userID]
   };
   res.render("urls_index", templateVars);
 });
+
+
 //_________________________________________________________________________
 
 
@@ -181,14 +196,31 @@ app.get("/urls/new", (req, res) => {
 
 
 // -----* SHORT URL *----- //
+
 app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
 
+  if (!userID) {
+    return res.status(401).send("You must be logged in to have access to this page.");
+  }
+
+  const urlID = req.params.id;
+  const url = urlDatabase[urlID];
+
+  if (!url) {
+    return res.status(404).send("URL can not be found.");
+  }
+
+  if (url.userID !== userID) {
+    return res.status(403).send("You are not allowed to access this URL.");
+  }
+
   const templateVars = {
-    longURL: urlDatabase[req.params.id],
-    id: req.params.id,
+    longURL: url,
+    id: urlID,
     user: users[userID]
   };
+
   res.render("urls_show", templateVars);
 });
 //_________________________________________________________________________
@@ -200,9 +232,40 @@ app.get("/u/:id", (req, res) => {
 });
 //_________________________________________________________________________
 
+//-----* EDIT URL ID *-----// NEW!!
+
+app.post("/urls/:id", (req, res) => {
+  const userID = req.session.user_id;
+  const urlID = req.params.id;
+  const newURL = req.body.newURL;
+
+  // Check if the user is logged in
+  if (!userID) {
+    res.status(401).send("You must be logged in to edit the URL.");
+    return;
+  }
+
+  // Check if the user owns the URL
+  if (urlDatabase[urlID].userID !== userID) {
+    res.status(403).send("You don't have permission to edit this URL.");
+    return;
+  }
+
+  // Update the URL
+  urlDatabase[urlID].longURL = newURL;
+
+  // Redirect to the updated URL page
+  res.redirect(`/urls/${urlID}`);
+});
+//_______________________________________________________________________
 
 // -----* POST FOR URL *----- //
+
 app.post('/urls', (req, res) => {
+  if (!req.session.user_id) {
+    return res.status(401).send('Error: You need to be logged in to create a new URL.');
+  }
+
   const newShortURL = generateRandomString();
   urlDatabase[newShortURL] = {
     longURL: req.body.longURL,
@@ -214,17 +277,21 @@ app.post('/urls', (req, res) => {
 //_________________________________________________________________________
 
 // -----* DELETE A URL *----- //
-app.post('/urls/:id/delete', (req, res) => {
+
+app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   const userID = req.session.user_id;
 
-  if (req.session.user_id === urlDatabase[id].userID) {
-
-    delete urlDatabase[id];
+  if (!userID) {
+    return res.status(401).send("Please log in to delete a URL.");
   }
 
+  if (req.session.user_id !== urlDatabase[id].userID) {
+    return res.status(403).send("You are not allowed to delete this URL.");
+  }
 
-  res.redirect('/urls');
+  delete urlDatabase[id];
+  res.redirect("/urls");
 });
 //_________________________________________________________________________
 
