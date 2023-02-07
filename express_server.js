@@ -2,10 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
+const { generateRandomString, getUserByEmail, } = require('./helper');
+const { urlDatabase, users, } = require('./database');
+
 const salt = bcrypt.genSaltSync(10);
 const app = express();
-
-const { generateRandomString, getUserByEmail, urlDatabase, users, } = require('./helper');
 
 const PORT = 8080; // default port 8080
 
