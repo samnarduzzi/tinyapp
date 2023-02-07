@@ -129,6 +129,8 @@ app.get("/u/:id", (req, res) => {
   return res.redirect(longURL);
 });
 
+//post requests
+
 app.post('/register', (req, res) => {
 
   const email = req.body.email;
