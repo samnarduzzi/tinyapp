@@ -42,7 +42,10 @@ const users = {
 
 //  HOMEPAGE  
 app.get('/', (req, res) => {
-  res.redirect('/urls');
+  if (users[req.session.user_id]) {
+    return res.redirect(`/urls`);
+  }
+  return res.redirect(`/login`);
 });
 
 app.get("/urls.json", (req, res) => {
@@ -153,7 +156,7 @@ app.get("/urls", (req, res) => {
     urls: userUrls,
     user: users[userID]
   };
-  
+
   res.render("urls_index", templateVars);
 });
 
@@ -161,18 +164,16 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
-    return res.status(401).send('Error: You need to be logged in to create a new URL');
-  }
-
-  if (!req.session.user_id) {
     return res.redirect('/login');
   }
+
   const templateVars = {
     user: users[req.session["user_id"]]
   };
 
   return res.render('urls_new', templateVars);
 });
+
 
 //  SHORT URL 
 app.get("/urls/:id", (req, res) => {
@@ -204,9 +205,18 @@ app.get("/urls/:id", (req, res) => {
 
 //  TO LONG URL  
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  const urlID = req.params.id;
+  const longURL = urlDatabase[urlID];
+
+  if (!longURL) {
+    return res.status(404).send('Error: URL not found');
+  }
+
+  return res.redirect(longURL);
 });
+
+
+
 
 // EDIT URL ID 
 app.post("/urls/:id", (req, res) => {
@@ -226,8 +236,9 @@ app.post("/urls/:id", (req, res) => {
 
   urlDatabase[urlID].longURL = newURL;
 
-  res.redirect(`/urls/${urlID}`);
+  res.redirect(`/urls`);
 });
+
 
 //  POST FOR URL  
 app.post('/urls', (req, res) => {
