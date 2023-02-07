@@ -121,12 +121,13 @@ app.get("/urls/:id", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const urlID = req.params.id;
   const longURL = urlDatabase[urlID];
+  console.log(longURL);
 
   if (!longURL) {
     return res.status(404).send('Error: URL not found');
   }
 
-  return res.redirect(longURL);
+  return res.redirect(longURL.longURL);
 });
 
 //post requests
